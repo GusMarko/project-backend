@@ -45,8 +45,10 @@ resource "aws_lambda_function" "lambda" {
 
   environment {
     variables = {
-      DYNAMODB_TABLE_NAME = aws_dynamodb_table.dynamodb.name
-      REGION              = var.aws_region
+      DYNAMODB_TABLE_NAME = "${aws_dynamodb_table.dynamodb.name}"
+      REGION              = "${var.aws_region}"
+      CLIENT_ID = "${var.client_id}"
+      CLIENT_SECRET = "${var.client_secret}"
     }
   }
 
