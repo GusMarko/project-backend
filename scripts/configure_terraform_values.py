@@ -2,6 +2,8 @@ import os
 import boto3
 import json
 
+
+#
 AWS_ACCOUNT_ID = os.environ.get("AWS_ACCOUNT_ID")
 AWS_REGION = os.environ.get("AWS_REGION")
 AWS_ACCESS_KEY = os.environ.get("AWS_ACCESS_KEY_ID")
