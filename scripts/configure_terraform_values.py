@@ -17,7 +17,7 @@ def main ():
     print(f"::set-output name=ecr_repo_name::{ecr_repo}")
      
 
-def replace_tfvars(curr_env, boto3_session):
+def replace_placeholders(curr_env, boto3_session):
     ecr_repo = "spotify-lambda-images-ecr"
     run_id = GITHUB_RUN_ID
     account_id = AWS_ACCOUNT_ID
