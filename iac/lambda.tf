@@ -47,8 +47,8 @@ resource "aws_lambda_function" "lambda" {
     variables = {
       DYNAMODB_TABLE_NAME = "${aws_dynamodb_table.dynamodb.name}"
       REGION              = "${var.aws_region}"
-      CLIENT_ID = "${var.client_id}"
-      CLIENT_SECRET = "${var.client_secret}"
+      SPOTIFY_CLIENT_ID = "${var.client_id}"
+      SPOTIFY_CLIENT_SECRET = "${var.client_secret}"
     }
   }
 
