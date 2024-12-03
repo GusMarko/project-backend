@@ -14,9 +14,6 @@ variable "env" {
   description = "branch"
 }
 
-variable "tags" {
-   type = string
-}
 
 variable "image_uri" {
   description = "Pth to code image stored in ecr"
