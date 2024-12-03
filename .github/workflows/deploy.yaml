@@ -1,0 +1,69 @@
+name: "Deploy Code"
+
+
+on:
+    pull_request:
+        branches:
+            - dev
+            - main
+
+
+
+env:
+  AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+  AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+  AWS_REGION: ${{ secrets.AWS_REGION }}
+  AWS_ACCOUNT_ID: ${{ secrets.AWS_ACCOUNT_ID }}
+  IMAGE_NAME: "spotify-data"
+
+
+
+jobs:
+    ExecuteTerraformCode:
+        runs-on: ubuntu-latest
+        steps:
+            - name: Code checkout
+              uses: actions/checkout@v2
+
+            - name: Setup Python
+              uses: actions/setup-python@v4
+              with:
+                python-version: "3.11"
+
+            - name: Configure terraform and pipeline values
+              id: pipeline_config
+              run: |
+                cd scripts
+                pip install boto3
+                python3 configure_terraform_values.py
+
+            - name: Configure AWS Credentials
+              uses: aws-actions/configure-aws-credentials@v4
+              with:
+                aws-access-key-id: ${{env.AWS_ACCESS_KEY_ID}}
+                aws-secret-access-key: ${{ env.AWS_SECRET_ACCESS_KEY}}
+                aws-region: ${{ env.AWS_REGION }}
+
+
+            - name: Login to ECR 
+              id: ecr_login
+              uses: aws-actions/amazon-ecr-login@v1
+
+            - name: Build Docker Image
+              run: |
+                docker build -t ${{env.IMAGE_NAME}}:$GITHUB_RUN_ID ./lambda/
+                docker tag ${{env.IMAGE_NAME}}:$GITHUB_RUN_ID ${{ steps.ecr_login.outputs.registry }}/${{ steps.pipeline_config.outputs.ecr_repo_name }}:$GITHUB_RUN_ID
+
+            - name: Push Docker Image to ECR 
+              run: |
+                docker push ${{ steps.ecr_login.outputs.registry }}/${{ steps.pipeline_config.outputs.ecr_repo_name }}:$GITHUB_RUN_ID
+            
+
+            - name: Setup Terraform
+              uses: hashicorp/setup-terraform@v2
+
+            - name: Terraform Apply
+              run: |
+                cd iac
+                terraform init
+                terraform apply -auto-approve
