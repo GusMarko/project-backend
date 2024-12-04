@@ -62,8 +62,8 @@ jobs:
             - name: Setup Terraform
               uses: hashicorp/setup-terraform@v2
 
-            - name: Terraform Destroy
+            - name: Terraform Apply
               run: |
                 cd iac
                 terraform init
-                terraform destroy -auto-approve
+                terraform apply -auto-approve

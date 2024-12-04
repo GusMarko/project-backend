@@ -52,13 +52,66 @@ resource "aws_lambda_function" "lambda" {
     }
   }
 
+   vpc_config {
+    subnet_ids         = ["${data.terraform_remote_state.networking.outputs.priv_sub_id}"]
+    security_group_ids = ["${aws_security_group.lambda_sg.id}"]  
+  }
+
+
   tags = {
     Name        = "spotify_lambda"
     Environment = "${var.env}"
   }
 }
 
+# security group for lambda
+resource "aws_security_group" "lambda_sg" {
+  name = "lambda_sg"
+  vpc_id = data.terraform_remote_state.networking.outputs.vpc_id
 
+  egress {
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  ingress {
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
+    cidr_blocks = ["192.168.0.0/24"] 
+  }
+
+}
+
+# lambda policy for network interface beause of security group
+resource "aws_iam_policy" "lambda_vpc_policy" {
+  name        = "spotify_lambda_vpc_policy"
+  description = "Allow Lambda to interact with VPC resources"
+  policy      = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Action = [
+          "ec2:DescribeSecurityGroups",
+          "ec2:DescribeSubnets",
+          "ec2:DescribeVpcs",
+          "ec2:CreateNetworkInterface",
+          "ec2:DeleteNetworkInterface",
+          "ec2:DescribeNetworkInterfaces"
+        ]
+        Effect   = "Allow"
+        Resource = "*"
+      }
+    ]
+  })
+}
+
+resource "aws_iam_role_policy_attachment" "lambda_vpc_policy_attachment" {
+  policy_arn = aws_iam_policy.lambda_vpc_policy.arn
+  role       = aws_iam_role.lambda_role.name
+}
 
 # lambda permission for api gateway invoke
 resource "aws_lambda_permission" "api_gateway_invoke" {
