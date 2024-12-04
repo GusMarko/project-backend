@@ -99,6 +99,7 @@ resource "aws_iam_policy" "lambda_vpc_policy" {
           "ec2:DescribeVpcs",
           "ec2:CreateNetworkInterface",
           "ec2:DeleteNetworkInterface"
+          "ec2:DescribeNetworkInterfaces"
         ]
         Effect   = "Allow"
         Resource = "*"
