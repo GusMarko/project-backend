@@ -5,6 +5,6 @@ data "terraform_remote_state" "networking" {
     organization = "hashicorp"
     bucket = "mg-terraform-state-storage"
     key = "project-networking/terraform.tfstate"
-    region = "${var.region}"
+    region = "${var.aws_region}"
   }
 }
