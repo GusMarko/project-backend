@@ -54,7 +54,7 @@ resource "aws_lambda_function" "lambda" {
 
    vpc_config {
     subnet_ids         = data.terraform_remote_state.networking.outputs.priv_sub_id  
-    security_group_ids = [aws_security_group.lambda_sg.id]  
+    security_group_ids = ["${aws_security_group.lambda_sg.id}"]  
   }
 
 
