@@ -85,6 +85,32 @@ resource "aws_security_group" "lambda_sg" {
 
 }
 
+# lambda policy for network interface beause of security group
+resource "aws_iam_policy" "lambda_vpc_policy" {
+  name        = "spotify_lambda_vpc_policy"
+  description = "Allow Lambda to interact with VPC resources"
+  policy      = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Action = [
+          "ec2:DescribeSecurityGroups",
+          "ec2:DescribeSubnets",
+          "ec2:DescribeVpcs",
+          "ec2:CreateNetworkInterface",
+          "ec2:DeleteNetworkInterface"
+        ]
+        Effect   = "Allow"
+        Resource = "*"
+      }
+    ]
+  })
+}
+
+resource "aws_iam_role_policy_attachment" "lambda_vpc_policy_attachment" {
+  policy_arn = aws_iam_policy.lambda_vpc_policy.arn
+  role       = aws_iam_role.lambda_role.name
+}
 
 # lambda permission for api gateway invoke
 resource "aws_lambda_permission" "api_gateway_invoke" {
