@@ -54,8 +54,12 @@ resource "aws_api_gateway_stage" "dev_stage" {
 resource "aws_api_gateway_method_response" "get_method_response" {
   rest_api_id = aws_api_gateway_rest_api.spotify_api.id
   resource_id = aws_api_gateway_resource.search.id
-  http_method = aws_api_gateway_method.get.http_method
+  http_method = "GET"
   status_code = "200"
+
+  response_models = {
+    "application/json" = "Empty"
+  }
 
   response_parameters = {
     "method.response.header.Access-Control-Allow-Origin" = true
@@ -66,8 +70,14 @@ resource "aws_api_gateway_method_response" "get_method_response" {
 resource "aws_api_gateway_integration_response" "get_integration_response" {
   rest_api_id = aws_api_gateway_rest_api.spotify_api.id
   resource_id = aws_api_gateway_resource.search.id
-  http_method = aws_api_gateway_method.get.http_method
+  http_method = "GET"
   status_code = "200"
+
+   response_templates = {
+    "application/json" = jsonencode({
+      "songs" : "$input.path('$.songs')"
+    })
+  }
 
   response_parameters = {
     "method.response.header.Access-Control-Allow-Origin" = "'*'"
