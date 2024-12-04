@@ -5,6 +5,7 @@ import json
 # dynamodb connection / client
 dynamodb = boto3.resource('dynamodb')
 table_name = os.environ.get
+table = dynamodb.Table(table_name)
 
 # setting spotify api credentials from env var of lambda
 SPOTIFY_CLIENT_ID = os.environ.get('SPOTIFY_CLIENT_ID')

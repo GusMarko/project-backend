@@ -42,9 +42,35 @@ resource "aws_api_gateway_deployment" "api_deployment" {
 
 
 # staging api gateway
-
 resource "aws_api_gateway_stage" "dev_stage" {
   rest_api_id = aws_api_gateway_rest_api.spotify_api.id
   deployment_id = aws_api_gateway_deployment.api_deployment.id
   stage_name    = "dev"
+}
+
+
+
+# api-g Method Response for CORS
+resource "aws_api_gateway_method_response" "get_method_response" {
+  rest_api_id = aws_api_gateway_rest_api.spotify_api.id
+  resource_id = aws_api_gateway_resource.search.id
+  http_method = aws_api_gateway_method.get.http_method
+  status_code = "200"
+
+  response_parameters = {
+    "method.response.header.Access-Control-Allow-Origin" = true
+  }
+}
+
+# api-g Integration Response for CORS
+resource "aws_api_gateway_integration_response" "get_integration_response" {
+  rest_api_id = aws_api_gateway_rest_api.spotify_api.id
+  resource_id = aws_api_gateway_resource.search.id
+  http_method = aws_api_gateway_method.get.http_method
+  status_code = "200"
+
+  response_parameters = {
+    "method.response.header.Access-Control-Allow-Origin" = "'*'"
+  }
+
 }
