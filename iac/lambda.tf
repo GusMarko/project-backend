@@ -52,12 +52,38 @@ resource "aws_lambda_function" "lambda" {
     }
   }
 
+   vpc_config {
+    subnet_ids         = data.terraform_remote_state.networking.outputs.priv.sub.id  # List of private subnets
+    security_group_ids = [aws_security_group.lambda_sg.id]  # Security group for Lambda
+  }
+
+
   tags = {
     Name        = "spotify_lambda"
     Environment = "${var.env}"
   }
 }
 
+# security group for lambda
+resource "aws_security_group" "lambda_sg" {
+  name = "lambda_sg"
+  vpc_id = data.terraform_remote_state.networking.outputs.vpc_id
+
+  egress {
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  ingress {
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
+    cidr_blocks = ["192.168.0.0/24"] 
+  }
+
+}
 
 
 # lambda permission for api gateway invoke
