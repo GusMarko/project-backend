@@ -1,5 +1,5 @@
 data "terraform_remote_state" "networking" {
-  backend = "remote"
+  backend = "s3"
 
   config = {
     organization = "hashicorp"
