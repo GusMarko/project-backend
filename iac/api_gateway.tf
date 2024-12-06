@@ -67,7 +67,7 @@ resource "aws_api_gateway_stage" "dev_stage" {
 
 resource "aws_api_gateway_method_response" "http_200" {
   rest_api_id = aws_api_gateway_rest_api.spotify_api.id
-  resource_id = aws_api_gateway_rest_api.spotify_api.root_resource_id
+  resource_id = aws_api_gateway_rest_api.spotify_api.id
   http_method = aws_api_gateway_method.get.http_method
   status_code = "200"
 
@@ -79,7 +79,7 @@ resource "aws_api_gateway_method_response" "http_200" {
 
 resource "aws_api_gateway_integration_response" "api_gw_integration_response" {
   rest_api_id = aws_api_gateway_rest_api.spotify_api.id
-  resource_id = aws_api_gateway_rest_api.spotify_api.root_resource_id
+  resource_id = aws_api_gateway_rest_api.spotify_api.id
   http_method = "GET"
   status_code = aws_api_gateway_method_response.http_200.status_code
 
