@@ -80,7 +80,7 @@ resource "aws_api_gateway_method_response" "http_200" {
 resource "aws_api_gateway_integration_response" "api_gw_integration_response" {
   rest_api_id = aws_api_gateway_rest_api.spotify_api.id
   resource_id = aws_api_gateway_rest_api.spotify_api.root_resource_id
-  http_method = aws_api_gateway_method.get.http_method
+  http_method = "GET"
   status_code = aws_api_gateway_method_response.http_200.status_code
 
   response_templates = {
