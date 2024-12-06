@@ -46,41 +46,16 @@ resource "aws_api_gateway_stage" "dev_stage" {
   rest_api_id = aws_api_gateway_rest_api.spotify_api.id
   deployment_id = aws_api_gateway_deployment.api_deployment.id
   stage_name    = "dev"
+
+
+  depends_on = [aws_api_gateway_deployment.api_deployment]
 }
 
 
-
-# api-g Method Response for CORS
-resource "aws_api_gateway_method_response" "get_method_response" {
-  rest_api_id = aws_api_gateway_rest_api.spotify_api.id
-  resource_id = aws_api_gateway_resource.search.id
-  http_method = "GET"
-  status_code = "200"
-
-  response_models = {
-    "application/json" = "Empty"
-  }
-
-  response_parameters = {
-    "method.response.header.Access-Control-Allow-Origin" = true
-  }
-}
-
-# api-g Integration Response for CORS
-resource "aws_api_gateway_integration_response" "get_integration_response" {
-  rest_api_id = aws_api_gateway_rest_api.spotify_api.id
-  resource_id = aws_api_gateway_resource.search.id
-  http_method = "GET"
-  status_code = "200"
-
-   response_templates = {
-    "application/json" = jsonencode({
-      "songs" : "$input.path('$.songs')"
-    })
-  }
-
-  response_parameters = {
-    "method.response.header.Access-Control-Allow-Origin" = "'*'"
-  }
-
+# Handling cors response and access / pre defined module 
+module "api-gateway-enable-cors" {
+source  = "squidfunk/api-gateway-enable-cors/aws"
+version = "0.3.3"
+api_id          = "${aws_api_gateway_rest_api.spotify_api.id}"
+api_resource_id = "${aws_api_gateway_resource.search.id}"
 }
