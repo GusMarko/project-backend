@@ -10,7 +10,9 @@ resource "aws_api_gateway_resource" "search" {
   path_part   = "search"  
 }
 
-# api's method
+ #------------------- GET METHOD -----------------------------
+
+# api GET method / cors response
 resource "aws_api_gateway_method" "get" {
   rest_api_id   = aws_api_gateway_rest_api.spotify_api.id
   resource_id   = aws_api_gateway_resource.search.id
@@ -26,8 +28,10 @@ resource "aws_api_gateway_integration" "lambda_integration" {
   integration_http_method = "GET"
   type                    = "AWS_PROXY"
   uri                     = aws_lambda_function.lambda.invoke_arn
+
 }
 
+ #------------------------------------------------------------------
 
 # deployment of api
 resource "aws_api_gateway_deployment" "api_deployment" {
@@ -37,9 +41,10 @@ resource "aws_api_gateway_deployment" "api_deployment" {
     create_before_destroy = true
   }
 
-  depends_on = [aws_api_gateway_integration.lambda_integration]
+  depends_on = [
+    aws_api_gateway_integration.lambda_integration
+    ]
 }
-
 
 # staging api gateway
 resource "aws_api_gateway_stage" "dev_stage" {
@@ -53,9 +58,32 @@ resource "aws_api_gateway_stage" "dev_stage" {
 
 
 # Handling cors response and access / pre defined module 
-module "api-gateway-enable-cors" {
-source  = "squidfunk/api-gateway-enable-cors/aws"
-version = "0.3.3"
-api_id          = "${aws_api_gateway_rest_api.spotify_api.id}"
-api_resource_id = "${aws_api_gateway_resource.search.id}"
+#module "api-gateway-enable-cors" {
+#source  = "squidfunk/api-gateway-enable-cors/aws"
+#version = "0.3.3"
+#api_id          = "${aws_api_gateway_rest_api.spotify_api.id}"
+#api_resource_id = "${aws_api_gateway_resource.search.id}"
+#}
+
+resource "aws_api_gateway_method_response" "http_200" {
+  rest_api_id = aws_api_gateway_rest_api.spotify_api.id
+  resource_id = aws_api_gateway_rest_api.spotify_api.root_resource_id
+  http_method = aws_api_gateway_method.get.http_method
+  status_code = "200"
+
+  response_models = {
+    "application/json" = "Empty"
+   }
+}
+
+
+resource "aws_api_gateway_integration_response" "api_gw_integration_response" {
+  rest_api_id = aws_api_gateway_rest_api.spotify_api.id
+  resource_id = aws_api_gateway_rest_api.spotify_api.root_resource_id
+  http_method = aws_api_gateway_method.get.http_method
+  status_code = aws_api_gateway_method_response.http_200.status_code
+
+  response_templates = {
+    "application/json" = ""
+  }
 }
