@@ -36,6 +36,11 @@ resource "aws_api_gateway_method_response" "response" {
   rest_api_id = aws_api_gateway_rest_api.spotify_api.id
   status_code = "200"
 
+  response_parameters = {
+    "method.response.header.Access-Control-Allow-Headers" = true,
+    "method.response.header.Access-Control-Allow-Methods" = true,
+    "method.response.header.Access-Control-Allow-Origin" = true
+  }
 }
 
 resource "aws_api_gateway_integration_response" "response" {
@@ -51,6 +56,13 @@ resource "aws_api_gateway_integration_response" "response" {
   depends_on = [ 
     aws_api_gateway_integration.lambda_integration
    ]
+
+   response_parameters = {
+        "method.response.header.Access-Control-Allow-Headers" = "'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token'"
+        "method.response.header.Access-Control-Allow-Methods" = "'GET,OPTIONS,POST,PUT'"
+        "method.response.header.Access-Control-Allow-Origin" = "'*'"
+
+   }
 }
 
 # deployment of api
