@@ -98,7 +98,9 @@ def build_response(status_code, body):
         "statusCode": status_code,
         "headers": {
             "Content-Type": "application/json",
-            "Access-Control-Allow-Origin": "*"
+            "Access-Control-Allow-Origin": "*",
+            "Access-Control-Allow-Methods": "GET,OPTIONS", 
+            "Access-Control-Allow-Headers": "Content-Type"
         },
         "body": json.dumps(body)
     }
