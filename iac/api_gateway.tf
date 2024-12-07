@@ -12,7 +12,7 @@ resource "aws_api_gateway_resource" "search" {
 
  #------------------- GET METHOD -----------------------------
 
-# api GET method / cors response
+# api GET method 
 resource "aws_api_gateway_method" "get" {
   rest_api_id   = aws_api_gateway_rest_api.spotify_api.id
   resource_id   = aws_api_gateway_resource.search.id
@@ -43,10 +43,12 @@ resource "aws_api_gateway_method" "options" {
 
 # Integration for OPTIONS
 resource "aws_api_gateway_integration" "options_integration" {
-  rest_api_id             = aws_api_gateway_rest_api.spotify_api.id
+   rest_api_id             = aws_api_gateway_rest_api.spotify_api.id
   resource_id             = aws_api_gateway_resource.search.id
-  http_method             = aws_api_gateway_method.options.http_method
-  type                    = "MOCK"
+  http_method             = aws_api_gateway_method.get.http_method
+  integration_http_method = "GET"
+  type                    = "AWS_PROXY"
+  uri                     = aws_lambda_function.lambda.invoke_arn
 
   request_templates = {
     "application/json" = "{\"statusCode\": 200}"
@@ -61,6 +63,10 @@ resource "aws_api_gateway_method_response" "get_response" {
   resource_id = aws_api_gateway_resource.search.id
   http_method = aws_api_gateway_method.get.http_method
   status_code = "200"
+
+  response_parameters = {
+    "method.response.header.Access-Control-Allow-Origin" = true
+  }
 
   response_models = {
     "application/json" = "Empty"
