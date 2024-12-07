@@ -26,7 +26,7 @@ resource "aws_api_gateway_integration" "lambda_integration" {
   resource_id             = aws_api_gateway_resource.search.id
   http_method             = aws_api_gateway_method.get.http_method
   integration_http_method = "GET"
-  type                    = "AWS_PROXY"
+  type                    = "AWS"
   uri                     = aws_lambda_function.lambda.invoke_arn
 }
 
@@ -38,7 +38,9 @@ resource "aws_api_gateway_deployment" "api_deployment" {
     redeployment = sha1(jsonencode([
       aws_api_gateway_resource.search.id,
       aws_api_gateway_method.get.id,
-      aws_api_gateway_integration.lambda_integration.id
+      aws_api_gateway_integration.lambda_integration.id,
+      aws_api_gateway_method_response.response.id,
+      aws_api_gateway_integration_response.response.id
     ]))
   }
 
@@ -59,5 +61,28 @@ resource "aws_api_gateway_stage" "dev_stage" {
 
 
   depends_on = [aws_api_gateway_deployment.api_deployment]
+}
+
+resource "aws_api_gateway_method_response" "response" {
+  http_method = aws_api_gateway_method.get.http_method
+  resource_id = aws_api_gateway_resource.search.id
+  rest_api_id = aws_api_gateway_rest_api.spotify_api.id
+  status_code = "200"
+
+}
+
+resource "aws_api_gateway_integration_response" "response" {
+  resource_id = aws_api_gateway_resource.search.id
+  rest_api_id = aws_api_gateway_rest_api.spotify_api.id
+  http_method = aws_api_gateway_method.get.http_method
+  status_code = aws_api_gateway_method_response.response.status_code
+
+  response_templates = {
+    "application/json" = jsonencode({"LambdaValue"="$input.path('$').body", "data" = "Custom Value"})
+  }
+
+  depends_on = [ 
+    aws_api_gateway_integration.lambda_integration
+   ]
 }
 
