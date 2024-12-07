@@ -51,7 +51,7 @@ resource "aws_api_gateway_deployment" "api_deployment" {
     ]
 }
 
-# staging api gateway
+# Staging api gateway
 resource "aws_api_gateway_stage" "dev_stage" {
   rest_api_id = aws_api_gateway_rest_api.spotify_api.id
   deployment_id = aws_api_gateway_deployment.api_deployment.id
