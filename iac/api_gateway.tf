@@ -54,17 +54,7 @@ resource "aws_api_gateway_integration" "options" {
     }
     EOF
   }
-
-  response_parameters = {
-    "method.response.header.Access-Control-Allow-Headers" = "'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token'"
-    "method.response.header.Access-Control-Allow-Methods" = "'OPTIONS,GET'"
-    "method.response.header.Access-Control-Allow-Origin"  = "'*'"
-  }
-
-    response_templates = {
-    "application/json" = ""
-    }
-  }
+}
 
   resource "aws_api_gateway_method_response" "options_response" {
   rest_api_id = aws_api_gateway_rest_api.spotify_api.id
