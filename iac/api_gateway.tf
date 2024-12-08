@@ -30,6 +30,7 @@ resource "aws_api_gateway_integration" "get_integration" {
   resource_id = aws_api_gateway_resource.search.id
   http_method = aws_api_gateway_method.get.http_method
   type        = "AWS_PROXY"
+  uri = aws_lambda_function.lambda.invoke_arn
   
   depends_on = [ aws_api_gateway_method.get ]
 }
