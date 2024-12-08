@@ -1,9 +1,10 @@
 import boto3
 import requests
 import json
+import os
 
 # dynamodb connection / client
-dynamodb = boto3.resource('dynamodb')
+dynamodb = boto3.resource ('dynamodb')
 table_name = os.environ.get
 table = dynamodb.Table(table_name)
 
