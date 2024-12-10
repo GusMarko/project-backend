@@ -25,9 +25,9 @@ def lambda_handler(event, context):
 # checking dynamodb for artistName hash key that matches
 # IF TRUE
     songs = get_songs_from_dynamodb(artist_name)
+    print(f"songs in dynamodb : {songs}")
     if songs:
         return build_response(200, {"songs": songs})
-    print(f"songs in dynamodb : {songs}")
 # IF FALSE 
 # fetch songs from spotify api
     songs = get_songs_from_spotify(artist_name)
