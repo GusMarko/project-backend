@@ -32,7 +32,7 @@ def lambda_handler(event, context):
 # fetch songs from spotify api
     songs = get_songs_from_spotify(artist_name)
     ("called and took data from spotify api")
-    print(songs)
+    print(f"songs are: songs")
     if songs:
 # store songs in dynamodb
         store_songs_in_dynamodb(artist_name, songs)
