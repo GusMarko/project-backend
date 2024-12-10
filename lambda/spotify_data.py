@@ -17,7 +17,7 @@ print("gave env variables")
 def lambda_handler(event, context):
 # Extract the artist name from the event - api gateway GET
     artist_name = event['queryStringParameters'].get('artist', '')
-    print("took artist name")
+    print(f"took artist name , it is: {artist_name}")
 # error handling
     if not artist_name:
         return build_response(400, {"error": "Artist name is required"})
@@ -31,8 +31,6 @@ def lambda_handler(event, context):
 # IF FALSE 
 # fetch songs from spotify api
     songs = get_songs_from_spotify(artist_name)
-    ("called and took data from spotify api")
-    print(f"songs are: songs")
     if songs:
 # store songs in dynamodb
         store_songs_in_dynamodb(artist_name, songs)
