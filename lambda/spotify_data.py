@@ -8,15 +8,16 @@ dynamodb = boto3.resource ('dynamodb')
 table_name = os.environ.get('DYNAMODB_TABLE_NAME')
 table = dynamodb.Table(table_name)
 
+
 # setting spotify api credentials from env var of lambda
 SPOTIFY_CLIENT_ID = os.environ.get('SPOTIFY_CLIENT_ID')
 SPOTIFY_CLIENT_SECRET = os.environ.get('SPOTIFY_CLIENT_SECRET')
-
+print("gave env variables")
 
 def lambda_handler(event, context):
 # Extract the artist name from the event - api gateway GET
     artist_name = event['queryStringParameters'].get('artist', '')
-
+    print("took artist name")
 # error handling
     if not artist_name:
         return build_response(400, {"error": "Artist name is required"})
@@ -26,13 +27,15 @@ def lambda_handler(event, context):
     songs = get_songs_from_dynamodb(artist_name)
     if songs:
         return build_response(200, {"songs": songs})
-
+    print(f"songs in dynamodb : {songs}")
 # IF FALSE 
 # fetch songs from spotify api
     songs = get_songs_from_spotify(artist_name)
+    ("called and took data from spotify api")
     if songs:
 # store songs in dynamodb
         store_songs_in_dynamodb(artist_name, songs)
+        print("songs stored")
         return build_response(200, {"songs": songs})
 # error handling if there is no songs 
     return build_response(404, {"error": "No songs found for the given artist"})
