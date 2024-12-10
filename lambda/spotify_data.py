@@ -90,7 +90,7 @@ def get_spotify_access_token ():
         "client_id": "${SPOTIFY_CLIENT_ID}",
         "client_secret": "${SPOTIFY_CLIENT_SECRET}"
     }
-    response = requests.post(auth_url, data = auth_data, timeout=10)
+    response = requests.post(auth_url, data = auth_data, timeout=30)
 
     if response.status_code == 200:
         return response.json().get("access_token")
