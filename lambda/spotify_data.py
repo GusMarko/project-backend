@@ -26,6 +26,7 @@ def lambda_handler(event, context):
 # IF TRUE
     songs = get_songs_from_dynamodb(artist_name)
     if songs:
+        print("songs already existed in dynamodb")
         return build_response(200, {"songs": songs})
 # IF FALSE 
 # fetch songs from spotify api
