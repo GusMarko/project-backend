@@ -57,13 +57,13 @@ jobs:
             - name: Push Docker Image to ECR 
               run: |
                 docker push ${{ steps.ecr_login.outputs.registry }}/${{ steps.pipeline_config.outputs.ecr_repo_name }}:$GITHUB_RUN_ID
-            
 
             - name: Setup Terraform
               uses: hashicorp/setup-terraform@v2
 
-            - name: Terminate Resources
+            - name: Terminate Resourcess
               run: |
                 cd iac
                 terraform init
                 terraform destroy -auto-approve
+
