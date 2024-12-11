@@ -43,16 +43,16 @@ def lambda_handler(event, context):
 #---------------------FUNCTIONS---------------------
 
 # function uses query function to find data which hash key artistName matches variable artist_name
-# def get_songs_from_dynamodb(artist_name):
-#     response = table.query(
-#         KeyConditionExpression=boto3.dynamodb.conditions.Key('artistName').eq(artist_name)
-#     )
-#     items = response.get('Items', [])
+def get_songs_from_dynamodb(artist_name):
+    response = table.query(
+        KeyConditionExpression=boto3.dynamodb.conditions.Key('artistName').eq(artist_name)
+    )
+    items = response.get('Items', [])
     
-#     if not items: 
-#         return False
+    if not items: 
+        return False
     
-#     return [item['songName'] for item in items]
+    return [item['songName'] for item in items]
 
 # authorization with spotify and calling spotify api for 5 songs from artist / storing response in list of strings
 def get_songs_from_spotify(artist_name):
