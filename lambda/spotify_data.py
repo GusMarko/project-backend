@@ -1,21 +1,23 @@
 import boto3
 import requests
 import json
+import os
 
 # dynamodb connection / client
-dynamodb = boto3.resource('dynamodb')
-table_name = os.environ.get
+dynamodb = boto3.resource ('dynamodb')
+table_name = os.environ.get('DYNAMODB_TABLE_NAME')
 table = dynamodb.Table(table_name)
+
 
 # setting spotify api credentials from env var of lambda
 SPOTIFY_CLIENT_ID = os.environ.get('SPOTIFY_CLIENT_ID')
 SPOTIFY_CLIENT_SECRET = os.environ.get('SPOTIFY_CLIENT_SECRET')
-
+print("gave env variables")
 
 def lambda_handler(event, context):
 # Extract the artist name from the event - api gateway GET
     artist_name = event['queryStringParameters'].get('artist', '')
-
+    print(f"took artist name , it is: {artist_name}")
 # error handling
     if not artist_name:
         return build_response(400, {"error": "Artist name is required"})
@@ -24,14 +26,15 @@ def lambda_handler(event, context):
 # IF TRUE
     songs = get_songs_from_dynamodb(artist_name)
     if songs:
+        print("songs already existed in dynamodb")
         return build_response(200, {"songs": songs})
-
 # IF FALSE 
 # fetch songs from spotify api
     songs = get_songs_from_spotify(artist_name)
     if songs:
 # store songs in dynamodb
         store_songs_in_dynamodb(artist_name, songs)
+        print("songs stored")
         return build_response(200, {"songs": songs})
 # error handling if there is no songs 
     return build_response(404, {"error": "No songs found for the given artist"})
@@ -42,11 +45,15 @@ def lambda_handler(event, context):
 
 # function uses query function to find data which hash key artistName matches variable artist_name
 def get_songs_from_dynamodb(artist_name):
-        response = table.query(
-            KeyConditionExpression=boto3.dynamodb.conditions.Key('artistName').eq(artist_name)
-        )
-        items = response.get('Items', [])
-        return [item['songName'] for item in items]
+    response = table.query(
+        KeyConditionExpression=boto3.dynamodb.conditions.Key('artistName').eq(artist_name)
+    )
+    items = response.get('Items', [])
+    
+    if not items: 
+        return False
+    
+    return [item['songName'] for item in items]
 
 # authorization with spotify and calling spotify api for 5 songs from artist / storing response in list of strings
 def get_songs_from_spotify(artist_name):
@@ -84,12 +91,12 @@ def get_spotify_access_token ():
         "client_id": SPOTIFY_CLIENT_ID,
         "client_secret": SPOTIFY_CLIENT_SECRET
     }
-    response = requests.post(auth_url, data = auth_data)
+    response = requests.post(auth_url, data = auth_data, timeout=30)
 
     if response.status_code == 200:
         return response.json().get("access_token")
     else:
-        raise Exception("Providing spotify access token failed")
+        raise Exception(f"Providing spotify access token failed, {response.status_code}: {response.text} ")
 
 
 # response function / building body of response 
@@ -98,7 +105,9 @@ def build_response(status_code, body):
         "statusCode": status_code,
         "headers": {
             "Content-Type": "application/json",
+            'Access-Control-Allow-Headers': 'Content-Type',
             "Access-Control-Allow-Origin": "*",
+            'Access-Control-Allow-Methods': 'OPTIONS,POST,GET'
         },
         "body": json.dumps(body)
     }
